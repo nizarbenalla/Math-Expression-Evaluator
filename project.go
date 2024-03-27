@@ -19,7 +19,7 @@ func main() {
 	//}
 	//flag.Parse()
 
-	expression := "3 *  ( 32 + 3 )"
+	expression := "1111 + 2222 * 3 + 44"
 
 	onlyParenthese := regexp.MustCompile(`[^\(\)\{\}\[\]]`).ReplaceAllString(expression, "")
 
@@ -62,9 +62,11 @@ func ShuntingYard(tokens []string) *queue.Queue {
 			operator.Push(o1)
 		}
 		if tokenIsOperator(o1) {
-			if operator.Len() > 0 {
-				for o2 := operator.Peek().(string); o2 != "(" && (precedence[o2] > precedence[o1] || (precedence[o2] == precedence[o1] && isLeftAssossiative(o1))); {
+			for operator.Len() > 0 {
+				if operator.Peek().(string) != "(" && (precedence[operator.Peek().(string)] > precedence[o1] || (precedence[operator.Peek().(string)] == precedence[o1] && isLeftAssossiative(o1))) {
 					output.Enqueue(operator.Pop())
+				} else {
+					break
 				}
 			}
 			operator.Push(o1)
@@ -155,7 +157,10 @@ func RPN_Evaluator(stack *stack.Stack) float64 {
 }
 
 func isValid(s string) bool {
-	if len(s) == 0 || len(s)%2 == 1 {
+	if len(s) == 0 {
+		return true
+	}
+	if len(s)%2 == 1 {
 		return false
 	}
 	matchingPair := map[rune]rune{

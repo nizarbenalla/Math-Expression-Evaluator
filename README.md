@@ -5,6 +5,7 @@
 - The main algorithms used in the program are the [Shunting yard](https://en.wikipedia.org/wiki/Shunting_yard_algorithm) and [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)/[AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) evaluation 
 to transform the mathematical infix expression into a postfix notation, making easier for computers to work with
 - I split the expression given by the user into many tokens - pass those to my infix to postfix function, then evaluate the AST
+- [Taylor series](http://hyperphysics.phy-astr.gsu.edu/hbase/tayser.html) was used to approximate the values of the trig functions
 ### Limitations
 - one limitation is the need for spaces between numbers, functions and operators in your expression (see example below)
 ### Dependencies

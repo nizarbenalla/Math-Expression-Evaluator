@@ -2,60 +2,120 @@ package ShuntingYardAlgorithm
 
 import (
 	"MathExpressionEvaluator_/trig"
+	"fmt"
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
 	"strconv"
 	"unicode"
 )
 
-func RPN_Evaluator(queue queue.Queue) float64 {
+func ShuntingYard(tokens []string) *queue.Queue {
+	precedence := make(map[string]int)
+	precedence["+"] = 1
+	precedence["-"] = 1
+	precedence["*"] = 2
+	precedence["/"] = 2
+	operator := stack.New()
+	output := queue.New()
+	for _, o1 := range tokens {
+		if TokenIsNumber(o1) {
+			output.Enqueue(o1)
+		}
+		if TokenIsFunction(o1) {
+			operator.Push(o1)
+		}
+		if TokenIsOperator(o1) {
+			for operator.Len() > 0 {
+				if operator.Peek().(string) != "(" && (precedence[operator.Peek().(string)] > precedence[o1] || (precedence[operator.Peek().(string)] == precedence[o1] && IsLeftAssossiative(o1))) {
+					output.Enqueue(operator.Pop())
+				} else {
+					break
+				}
+			}
+			operator.Push(o1)
+		}
+		if o1 == "(" {
+			operator.Push(o1)
+		}
+		if o1 == ")" {
+			for operator.Peek() != "(" {
+				if operator.Len() > 0 {
+					output.Enqueue(operator.Pop())
+				} else {
+					fmt.Println("Mismatch in parentheses2")
+				}
+			}
+			operator.Pop()
+			if operator.Len() > 0 && TokenIsFunction(operator.Peek().(string)) {
+				output.Enqueue(operator.Pop())
+			}
+		}
+	}
+
+	for operator.Len() > 0 {
+		if operator.Peek() == "(" {
+			fmt.Println("Mismatch in parentheses3")
+		}
+		output.Enqueue(operator.Pop())
+	}
+
+	return output
+}
+
+func RpnEvaluator(queue queue.Queue) float64 {
 	if queue.Len() == 0 {
 		return 0
 	}
-	stack := stack.New()
+	numbers := stack.New()
 	for queue.Len() > 0 {
 		if TokenIsNumber(queue.Peek().(string)) {
-			stack.Push(queue.Dequeue())
+			x, _ := strconv.ParseFloat(queue.Dequeue().(string), 64)
+			numbers.Push(x)
 		} else if TokenIsFunction(queue.Peek().(string)) {
-			value, _ := strconv.ParseFloat(stack.Pop().(string), 64)
+			value, _ := strconv.ParseFloat(numbers.Pop().(string), 64)
 
 			switch queue.Peek().(string) {
 			case "cos":
-				stack.Push(trig.Cos(value))
+				numbers.Push(trig.Cos(value))
+			case "acos":
+				numbers.Push(trig.Acos(value))
 			case "sin":
-				stack.Push(trig.Sin(value))
+				numbers.Push(trig.Sin(value))
+			case "asin":
+				numbers.Push(trig.Asin(value))
 			case "tan":
-				stack.Push(trig.Tan(value))
+				numbers.Push(trig.Tan(value))
 			case "atan":
-				stack.Push(trig.Atan(value))
+				numbers.Push(trig.Atan(value))
 			case "sqrt":
-				stack.Push(trig.Sqrt(value))
+				numbers.Push(trig.Sqrt(value))
 			case "pow":
-				exponent, _ := strconv.Atoi(stack.Pop().(string))
-				stack.Push(trig.Pow(value, exponent))
+				exponent, _ := strconv.Atoi(numbers.Pop().(string))
+				numbers.Push(trig.Pow(value, exponent))
 
 			}
 			queue.Dequeue()
 
 		} else if TokenIsOperator(queue.Peek().(string)) {
-			value1, _ := strconv.ParseFloat(stack.Pop().(string), 64)
-			value2, _ := strconv.ParseFloat(stack.Pop().(string), 64)
+
+			value1 := numbers.Pop().(float64)
+			value2 := numbers.Pop().(float64)
 			switch queue.Peek().(string) {
 			case "+":
-				stack.Push(value1 + value2)
+				numbers.Push(value1 + value2)
 			case "-":
-				stack.Push(value2 - value1)
+				numbers.Push(value2 - value1)
 			case "/":
-				stack.Push(value2 / value1)
+				numbers.Push(value2 / value1)
 			case "*":
-				stack.Push(value1 * value2)
+				numbers.Push(value1 * value2)
 			}
 			queue.Dequeue()
 
 		}
 
 	}
-	return stack.Pop().(float64)
+	return numbers.Pop().(float64)
 }
 func IsLeftAssossiative(o1 string) bool {
 	leftAssossiative := make(map[string]bool)
@@ -121,15 +181,15 @@ func IsValid(s string) bool {
 		'{': '}',
 		'[': ']',
 	}
-	stack := []rune{}
+	var pile []rune
 	for _, r := range s {
 		if _, ok := matchingPair[r]; ok {
-			stack = append(stack, r)
-		} else if len(stack) == 0 || matchingPair[stack[len(stack)-1]] != r {
+			pile = append(pile, r)
+		} else if len(pile) == 0 || matchingPair[pile[len(pile)-1]] != r {
 			return false
 		} else {
-			stack = stack[:len(stack)-1]
+			pile = pile[:len(pile)-1]
 		}
 	}
-	return len(stack) == 0
+	return len(pile) == 0
 }

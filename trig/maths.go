@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-const epsilon = 1e-10 // Small value for floating point comparison
+const epsilon = 1e-10
 const pi = 3.14159265358979323846264338327950288419716939937510582097494459
 
 func DegreeToRadian(deg float64) float64 {

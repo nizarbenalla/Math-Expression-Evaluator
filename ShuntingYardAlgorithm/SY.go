@@ -18,36 +18,34 @@ func ShuntingYard(tokens []string) *queue.Queue {
 	operator := stack.New()
 	output := queue.New()
 	for _, o1 := range tokens {
-		if TokenIsNumber(o1) {
-			output.Enqueue(o1)
-		}
-		if TokenIsFunction(o1) {
-			operator.Push(o1)
-		}
-		if TokenIsOperator(o1) {
-			for operator.Len() > 0 {
-				if operator.Peek().(string) != "(" && (precedence[operator.Peek().(string)] > precedence[o1] || (precedence[operator.Peek().(string)] == precedence[o1] && IsLeftAssossiative(o1))) {
-					output.Enqueue(operator.Pop())
-				} else {
-					break
+		if o1 != "" {
+			if TokenIsNumber(o1) {
+				output.Enqueue(o1)
+			} else if TokenIsFunction(o1) {
+				operator.Push(o1)
+			} else if TokenIsOperator(o1) {
+				for operator.Len() > 0 {
+					if operator.Peek().(string) != "(" && (precedence[operator.Peek().(string)] > precedence[o1] || (precedence[operator.Peek().(string)] == precedence[o1] && IsLeftAssossiative(o1))) {
+						output.Enqueue(operator.Pop())
+					} else {
+						break
+					}
 				}
-			}
-			operator.Push(o1)
-		}
-		if o1 == "(" {
-			operator.Push(o1)
-		}
-		if o1 == ")" {
-			for operator.Peek() != "(" {
-				if operator.Len() > 0 {
-					output.Enqueue(operator.Pop())
-				} else {
-					fmt.Println("Mismatch in parentheses2")
+				operator.Push(o1)
+			} else if o1 == "(" {
+				operator.Push(o1)
+			} else if o1 == ")" {
+				for operator.Peek() != "(" {
+					if operator.Len() > 0 {
+						output.Enqueue(operator.Pop())
+					} else {
+						fmt.Println("Mismatch in parentheses2")
+					}
 				}
-			}
-			operator.Pop()
-			if operator.Len() > 0 && TokenIsFunction(operator.Peek().(string)) {
-				output.Enqueue(operator.Pop())
+				operator.Pop()
+				if operator.Len() > 0 && TokenIsFunction(operator.Peek().(string)) {
+					output.Enqueue(operator.Pop())
+				}
 			}
 		}
 	}
@@ -72,7 +70,7 @@ func RpnEvaluator(queue queue.Queue) float64 {
 			x, _ := strconv.ParseFloat(queue.Dequeue().(string), 64)
 			numbers.Push(x)
 		} else if TokenIsFunction(queue.Peek().(string)) {
-			value, _ := strconv.ParseFloat(numbers.Pop().(string), 64)
+			value := numbers.Pop().(float64)
 
 			switch queue.Peek().(string) {
 			case "cos":

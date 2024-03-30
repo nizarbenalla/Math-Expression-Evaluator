@@ -22,7 +22,7 @@ func evaluationExpression(expression *string) float64 {
 }
 
 func readExpression() *string {
-	fmt.Println("Enter the expression you want to compute")
+	fmt.Println("Your answer is :")
 	expression := flag.String("math", "", "the expression you want to compute goes here")
 	if len(os.Args) < 2 {
 		fmt.Println("expected 'math' subcommands")

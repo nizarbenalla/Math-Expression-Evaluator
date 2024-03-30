@@ -6,7 +6,9 @@
 to transform the mathematical infix expression into a postfix notation, making easier for computers to work with
 - I split the expression given by the user into many tokens - pass those to my infix to postfix function, then evaluate the AST
 ### Limitations
-- one limitation is the need for space in your expression (see example below)
+- one limitation is the need for spaces between numbers, functions and operators in your expression (see example below)
+### Dependencies
+- the `github.com/golang-collections/collection` repo is used for the Stack and Queue Data Structure
 
 ## How to Build the program
 #### clone the repo
